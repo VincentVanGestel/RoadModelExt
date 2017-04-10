@@ -1,19 +1,16 @@
 package com.github.vincentvangestel.roadmodelext;
 
-import java.util.List;
-
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
 
+import com.github.christofluyten.data.RoutingTable;
 import com.github.rinde.rinsim.core.model.DependencyProvider;
 import com.github.rinde.rinsim.core.model.road.RoadModelBuilders;
 import com.github.rinde.rinsim.core.model.road.RoadModelBuilders.AbstractDynamicGraphRMB;
 import com.github.rinde.rinsim.geom.ListenableGraph;
-import com.github.rinde.rinsim.geom.Point;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Table;
 
 /**
  * Builder for {@link CachedDynamicGraphRoadModel} instances.
@@ -28,7 +25,7 @@ public abstract class CachedDynamicGraphRMB
   @Override
   protected abstract Supplier<ListenableGraph<?>> getGraphSupplier();
   
-  protected abstract Supplier<Table<Point, Point, List<Point>>> getCacheSupplier();
+  protected abstract Supplier<RoutingTable> getCacheSupplier();
 
   @Override
   public CachedDynamicGraphRoadModel build(DependencyProvider dependencyProvider) {
@@ -60,7 +57,7 @@ public abstract class CachedDynamicGraphRMB
 
   static CachedDynamicGraphRMB create(
 		  Supplier<? extends ListenableGraph<?>> graphSupplier,
-				  Supplier<Table<Point, Point, List<Point>>> cacheSupplier) {
+				  Supplier<RoutingTable> cacheSupplier) {
 	  return create(DEFAULT_DISTANCE_UNIT, DEFAULT_SPEED_UNIT, graphSupplier,
 			  true, cacheSupplier);
   }
@@ -70,7 +67,7 @@ public abstract class CachedDynamicGraphRMB
 		  Unit<Velocity> speedUnit,
 		  Supplier<? extends ListenableGraph<?>> graphSupplier,
 				  boolean isGmcEnabled,
-				  Supplier<Table<Point, Point, List<Point>>> cacheSupplier) {
+				  Supplier<RoutingTable> cacheSupplier) {
 	  return new AutoValue_CachedDynamicGraphRMB(distanceUnit,
 			  speedUnit, isGmcEnabled, (Supplier<ListenableGraph<?>>) graphSupplier, cacheSupplier);
   }

@@ -1,11 +1,9 @@
 
 package com.github.vincentvangestel.roadmodelext;
 
+import com.github.christofluyten.data.RoutingTable;
 import com.github.rinde.rinsim.geom.ListenableGraph;
-import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Table;
-import java.util.List;
 import javax.annotation.Generated;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Velocity;
@@ -18,14 +16,14 @@ import javax.measure.unit.Unit;
   private final Unit<Velocity> speedUnit;
   private final boolean modCheckEnabled;
   private final Supplier<ListenableGraph<?>> graphSupplier;
-  private final Supplier<Table<Point, Point, List<Point>>> cacheSupplier;
+  private final Supplier<RoutingTable> cacheSupplier;
 
   AutoValue_CachedDynamicGraphRMB(
       Unit<Length> distanceUnit,
       Unit<Velocity> speedUnit,
       boolean modCheckEnabled,
       Supplier<ListenableGraph<?>> graphSupplier,
-      Supplier<Table<Point, Point, List<Point>>> cacheSupplier) {
+      Supplier<RoutingTable> cacheSupplier) {
     if (distanceUnit == null) {
       throw new NullPointerException("Null distanceUnit");
     }
@@ -66,7 +64,7 @@ import javax.measure.unit.Unit;
   }
 
   @Override
-  protected Supplier<Table<Point, Point, List<Point>>> getCacheSupplier() {
+  protected Supplier<RoutingTable> getCacheSupplier() {
     return cacheSupplier;
   }
 

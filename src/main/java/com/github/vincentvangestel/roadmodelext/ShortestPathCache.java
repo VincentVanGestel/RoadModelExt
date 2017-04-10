@@ -4,23 +4,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
-import java.util.List;
 
-import com.github.rinde.rinsim.geom.Point;
+import com.github.christofluyten.data.RoutingTable;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Table;
 
 public class ShortestPathCache {
 
 	static final String R_BRACE = ")";
 
-	public static Table<Point,Point,List<Point>> read(String path) throws IOException {
-		Table<Point,Point,List<Point>> cache;
+	public static RoutingTable read(String path) throws IOException {
+		RoutingTable cache;
 		try {
 			FileInputStream fileIn = new FileInputStream(path);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			cache = (Table<Point, Point, List<Point>>) in.readObject();
+			cache = (RoutingTable) in.readObject();
 			in.close();
 			fileIn.close();
 		} catch(ClassNotFoundException e) {
@@ -30,25 +28,26 @@ public class ShortestPathCache {
 		return cache;
 	}
 
-	public static Supplier<Table<Point, Point, List<Point>>> getShortestPathCacheSupplier(
+	public static Supplier<RoutingTable> getShortestPathCacheSupplier(
 			String path) {
 		return SPCacheSup.create(path);
 	}
 
-	public static Supplier<Table<Point, Point, List<Point>>> getShortestPathCacheSupplier(
+	public static Supplier<RoutingTable> getShortestPathCacheSupplier(
 			Path path) {
 		return SPCacheSup.create(path.toString());
 	}
 
 	@AutoValue
 	abstract static class SPCacheSup
-	implements Supplier<Table<Point, Point, List<Point>>> {
+	implements Supplier<RoutingTable> {
 
 		abstract String path();
 
 		@Override
-		public Table<Point, Point, List<Point>> get() {
+		public RoutingTable get() {
 			try {
+				System.out.println("Reading cache from disk...");
 				return read(path());
 			} catch (final IOException e) {
 				throw new IllegalArgumentException(e);
