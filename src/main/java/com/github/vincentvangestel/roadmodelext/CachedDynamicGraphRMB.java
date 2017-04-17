@@ -1,5 +1,6 @@
 package com.github.vincentvangestel.roadmodelext;
 
+import javax.annotation.Nullable;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
@@ -25,7 +26,11 @@ public abstract class CachedDynamicGraphRMB
   @Override
   protected abstract Supplier<ListenableGraph<?>> getGraphSupplier();
   
+  @Nullable
   protected abstract Supplier<RoutingTable> getCacheSupplier();
+  
+  @Nullable
+  protected abstract String getCachePath();
 
   @Override
   public CachedDynamicGraphRoadModel build(DependencyProvider dependencyProvider) {
@@ -35,19 +40,19 @@ public abstract class CachedDynamicGraphRMB
   @Override
   public CachedDynamicGraphRMB withModificationCheck(boolean enabled) {
     return create(getDistanceUnit(), getSpeedUnit(), getGraphSupplier(),
-      enabled, getCacheSupplier());
+      enabled, getCacheSupplier(), getCachePath());
   }
   
   @Override
   public CachedDynamicGraphRMB withDistanceUnit(Unit<Length> unit) {
     return create(unit, getSpeedUnit(), getGraphSupplier(),
-      isModCheckEnabled(), getCacheSupplier());
+      isModCheckEnabled(), getCacheSupplier(), getCachePath());
   }
 
   @Override
   public CachedDynamicGraphRMB withSpeedUnit(Unit<Velocity> unit) {
     return create(getDistanceUnit(), unit, getGraphSupplier(),
-      isModCheckEnabled(), getCacheSupplier());
+      isModCheckEnabled(), getCacheSupplier(), getCachePath());
   }
   @Override
   public String toString() {
@@ -57,9 +62,9 @@ public abstract class CachedDynamicGraphRMB
 
   static CachedDynamicGraphRMB create(
 		  Supplier<? extends ListenableGraph<?>> graphSupplier,
-				  Supplier<RoutingTable> cacheSupplier) {
+				  Supplier<RoutingTable> cacheSupplier, String cachePath) {
 	  return create(DEFAULT_DISTANCE_UNIT, DEFAULT_SPEED_UNIT, graphSupplier,
-			  true, cacheSupplier);
+			  true, cacheSupplier, cachePath);
   }
 
   @SuppressWarnings("unchecked")
@@ -67,8 +72,9 @@ public abstract class CachedDynamicGraphRMB
 		  Unit<Velocity> speedUnit,
 		  Supplier<? extends ListenableGraph<?>> graphSupplier,
 				  boolean isGmcEnabled,
-				  Supplier<RoutingTable> cacheSupplier) {
+				  Supplier<RoutingTable> cacheSupplier, String cachePath) {
 	  return new AutoValue_CachedDynamicGraphRMB(distanceUnit,
-			  speedUnit, isGmcEnabled, (Supplier<ListenableGraph<?>>) graphSupplier, cacheSupplier);
+			  speedUnit, isGmcEnabled, (Supplier<ListenableGraph<?>>) graphSupplier, cacheSupplier, cachePath);
   }
+
 }

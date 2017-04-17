@@ -23,6 +23,7 @@ import com.github.rinde.rinsim.geom.Graphs;
 import com.github.rinde.rinsim.geom.ImmutableGraph;
 import com.github.rinde.rinsim.geom.ListenableGraph;
 import com.github.rinde.rinsim.geom.Point;
+import com.github.vincentvangestel.roadmodelext.ShortestPathCache.StaticSPCacheSup;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.collect.LinkedHashMultimap;
@@ -42,17 +43,19 @@ public class CachedDynamicGraphRoadModel extends DynamicGraphRoadModelImpl {
 	protected Optional<CachedDynamicGraphRoadModelSnapshot> snapshot;
 
 	private RoutingTable pathTable;
-	private final Multimap<Class<?>, RoadUser> classObjectMap; 
+//	private final Multimap<Class<?>, RoadUser> classObjectMap; 
 
 	CachedDynamicGraphRoadModel(ListenableGraph<?> g, CachedDynamicGraphRMB b) {
 		super(g, b);
 
 		if(b.getCacheSupplier() != null) {
 			pathTable = b.getCacheSupplier().get();
+		} else if(b.getCachePath() != null) {
+			pathTable = StaticSPCacheSup.get(b.getCachePath());
 		} else {
 			pathTable = RoutingTables.createDefaultTable();
 		}
-		classObjectMap = LinkedHashMultimap.create();
+//		classObjectMap = LinkedHashMultimap.create();
 	}
 
 	/**
@@ -107,41 +110,41 @@ public class CachedDynamicGraphRoadModel extends DynamicGraphRoadModelImpl {
 		return path;
 	}
 
-	@Override
-	public void addObjectAt(RoadUser newObj, Point pos) {
-		super.addObjectAt(newObj, pos);
-		classObjectMap.put(newObj.getClass(), newObj);
-	}
+//	@Override
+//	public void addObjectAt(RoadUser newObj, Point pos) {
+//		super.addObjectAt(newObj, pos);
+//		classObjectMap.put(newObj.getClass(), newObj);
+//	}
 
-	@Override
-	public void addObjectAtSamePosition(RoadUser newObj, RoadUser existingObj) {
-		super.addObjectAtSamePosition(newObj, existingObj);
-		classObjectMap.put(newObj.getClass(), newObj);
-	}
+//	@Override
+//	public void addObjectAtSamePosition(RoadUser newObj, RoadUser existingObj) {
+//		super.addObjectAtSamePosition(newObj, existingObj);
+//		classObjectMap.put(newObj.getClass(), newObj);
+//	}
 
-	@Override
-	public void clear() {
-		super.clear();
-		classObjectMap.clear();
-	}
+//	@Override
+//	public void clear() {
+//		super.clear();
+//		classObjectMap.clear();
+//	}
 
-	/**
-	 * O(1) using a direct lookup. {@inheritDoc}
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public <Y extends RoadUser> Set<Y> getObjectsOfType(final Class<Y> type) {
-		checkArgument(type != null, "type can not be null");
-		final Set<Y> set = new LinkedHashSet<>();
-		set.addAll((Set<Y>) classObjectMap.get(type));
-		return set;
-	}
+//	/**
+//	 * O(1) using a direct lookup. {@inheritDoc}
+//	 */
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	public <Y extends RoadUser> Set<Y> getObjectsOfType(final Class<Y> type) {
+//		checkArgument(type != null, "type can not be null");
+//		final Set<Y> set = new LinkedHashSet<>();
+//		set.addAll((Set<Y>) classObjectMap.get(type));
+//		return set;
+//	}
 
-	@Override
-	public void removeObject(RoadUser o) {
-		super.removeObject(o);
-		classObjectMap.remove(o.getClass(), o);
-	}
+//	@Override
+//	public void removeObject(RoadUser o) {
+//		super.removeObject(o);
+//		classObjectMap.remove(o.getClass(), o);
+//	}
 
 	private void updateSnapshot() {
 		snapshot = Optional.of(CachedDynamicGraphRoadModelSnapshot.create(
@@ -149,7 +152,7 @@ public class CachedDynamicGraphRoadModel extends DynamicGraphRoadModelImpl {
 	}
 
 	public static CachedDynamicGraphRMB builder(Supplier<? extends ListenableGraph<?>> graphSupplier,
-			Supplier<RoutingTable> cacheSupplier) {
-		return CachedDynamicGraphRMB.create(graphSupplier, cacheSupplier);	  
+			Supplier<RoutingTable> cacheSupplier, String cachePath) {
+		return CachedDynamicGraphRMB.create(graphSupplier, cacheSupplier, cachePath);	  
 	}
 }

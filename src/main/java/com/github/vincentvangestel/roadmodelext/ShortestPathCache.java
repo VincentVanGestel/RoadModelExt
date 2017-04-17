@@ -37,6 +37,27 @@ public class ShortestPathCache {
 			Path path) {
 		return SPCacheSup.create(path.toString());
 	}
+	
+	public static class StaticSPCacheSup {
+		
+		static RoutingTable cache;
+		
+		public static RoutingTable get(String path) {
+			synchronized (StaticSPCacheSup.class) {
+				if(cache == null) {
+					try {
+						System.out.println("Reading cache from disk...");
+						cache = read(path);
+					} catch (final IOException e) {
+						throw new IllegalArgumentException(e);
+					}
+				}
+			}
+			System.out.println("Returning Cache");
+			return cache;
+		}
+		
+	}
 
 	@AutoValue
 	abstract static class SPCacheSup
