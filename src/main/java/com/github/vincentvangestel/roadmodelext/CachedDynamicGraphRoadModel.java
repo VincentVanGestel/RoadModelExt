@@ -16,6 +16,7 @@ import com.github.christofluyten.data.RoutingTable;
 import com.github.christofluyten.data.RoutingTables;
 import com.github.rinde.rinsim.core.model.road.DynamicGraphRoadModelImpl;
 import com.github.rinde.rinsim.core.model.road.GraphRoadModelImpl;
+import com.github.rinde.rinsim.core.model.road.RoadModelSnapshot;
 import com.github.rinde.rinsim.core.model.road.RoadPath;
 import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.geom.GeomHeuristic;
@@ -47,7 +48,8 @@ public class CachedDynamicGraphRoadModel extends DynamicGraphRoadModelImpl {
 
 	CachedDynamicGraphRoadModel(ListenableGraph<?> g, CachedDynamicGraphRMB b) {
 		super(g, b);
-
+		snapshot = Optional.absent();
+		
 		if(b.getCacheSupplier() != null) {
 			pathTable = b.getCacheSupplier().get();
 		} else if(b.getCachePath() != null) {
@@ -149,6 +151,14 @@ public class CachedDynamicGraphRoadModel extends DynamicGraphRoadModelImpl {
 	private void updateSnapshot() {
 		snapshot = Optional.of(CachedDynamicGraphRoadModelSnapshot.create(
 				ImmutableGraph.copyOf(getGraph()), getPathCache(), getDistanceUnit()));
+	}
+	
+	@Override
+	public RoadModelSnapshot getSnapshot() {
+		if(!snapshot.isPresent()) {
+			updateSnapshot();
+		}
+		return snapshot.get();
 	}
 
 	public static CachedDynamicGraphRMB builder(Supplier<? extends ListenableGraph<?>> graphSupplier,
